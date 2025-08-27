@@ -5,24 +5,24 @@ import React, { useState, useEffect, useRef } from "react";
 const TOTAL_SETS = 15;
 const REPS_PER_SET = 10;
 const REST_BETWEEN_SETS = 4; // seconds
-const REP_COUNTDOWN = 20; // seconds
+var REP_COUNTDOWN = 21; // seconds
 
 const exercises = [
-  { name: "Warm up", image: "/exercise1.jpg", restBetweenReps: 1 },
-  { name: "Left Khutta uchalne", image: "/exercise2.jpg", restBetweenReps: 6 },
-  { name: "Right khutta uchalne", image: "/exercise0.jpg", restBetweenReps: 10 },
-  { name: "Duetai khutta uchalne", image: "/exercise3.jpg", restBetweenReps: 5 },
-  { name: "Left Khutta tanne", image: "/exercise4.jpg", restBetweenReps: 5 },
+  { name: "Warm up", image: "/exercise1.jpg", restBetweenReps: 0 },
+  { name: "Left Khutta uchalne", image: "/exercise2.jpg", restBetweenReps: 10 },
+  { name: "Right khutta uchalne", image: "/exercise0.jpg", restBetweenReps: 11 },
+  { name: "Duetai khutta uchalne", image: "/exercise4.jpg", restBetweenReps: 10 },
+  { name: "Left Khutta tanne", image: "/exercise3.jpg", restBetweenReps: 10 },
   { name: "Right khutta tanne", image: "/exercise5.jpg", restBetweenReps: 10 },
-  { name: "Pillow knee press", image: "/exercise6.jpg", restBetweenReps: 5 },
+  { name: "Pillow knee press", image: "/exercise6.jpg", restBetweenReps: 4 },
   { name: "Pillow ankel press", image: "/exercise7.jpg", restBetweenReps: 5 },
-  { name: "Kammar uthaune", image: "/exercise8.jpg", restBetweenReps: 10 },
-  { name: "Right khutta matra tekera kammar uchalne", image: "/exercise9.jpg", restBetweenReps: 12 },
-  { name: "Pushup", image: "/exercise10.jpg", restBetweenReps: 5 },
-  { name: "Right khutta bend up and down", image: "/exercise11.jpg", restBetweenReps: 1 },
+  { name: "Kammar uthaune", image: "/exercise9.jpg", restBetweenReps: 10 },
+  { name: "Right khutta matra tekera kammar uchalne", image: "/exercise9.jpg", restBetweenReps: 15 },
+  { name: "Pushup", image: "/exercise10.jpg", restBetweenReps: 10 },
+  { name: "Right khutta bend up and down", image: "/exercise11.jpg", restBetweenReps: 0 },
   { name: "Right side fly", image: "/exercise12.jpg", restBetweenReps: 8 },
   { name: "Left side fly", image: "/exercise13.jpg", restBetweenReps: 8 },
-  { name: "End", image: "/exercise14.jpg", restBetweenReps: 1 },
+  { name: "End", image: "/exercise14.jpg", restBetweenReps: 0 },
 ];
 
 const phases = {
@@ -43,6 +43,7 @@ export default function HipExerciseApp() {
   const [history, setHistory] = useState([]);
   const [estimatedCompletionTime, setEstimatedCompletionTime] = useState("");
 
+  const spRef = useRef(true);
   const timerRef = useRef(null);
   const isPausedRef = useRef(false);
   const hasResumedRef = useRef(false);
@@ -100,7 +101,19 @@ export default function HipExerciseApp() {
 
       setRemaining(prev => {
         const newVal = prev - 1;
-        if (newVal > 0 && newVal <= 3) speak(newVal.toString(), 1.0);
+            
+            if(newVal > 0 && (exercises[currentSetRef.current].name == "Warm up" || exercises[currentSetRef.current].name == "End" || exercises[currentSetRef.current].name == "Right khutta bend up and down")){
+          if(newVal % 3 === 0 || newVal === REP_COUNTDOWN - 1){
+          const intervalPassed = Math.floor(REP_COUNTDOWN - newVal)/3;
+                if (intervalPassed % 2=== 0 || newVal === REP_COUNTDOWN - 1) {
+  speak("mathitira", 0.1).then(() => new Promise(res => setTimeout(res, 3000))) // wait 300ms after speaking
+} else {
+  speak("talatira", 0.1).then(() => new Promise(res => setTimeout(res, 3000))).then(() => spRef.current = true) // wait 300ms after speaking
+}
+}
+            } else {
+        if (newVal > 0 && newVal <= 4) speak(newVal.toString(), 1.0);
+            }
         if (newVal <= 0) {
           clearInterval(timerRef.current);
           speak("Stop", 1.0).then(proceedAfterRep);
@@ -108,7 +121,7 @@ export default function HipExerciseApp() {
         }
         return newVal;
       });
-    }, 1000);
+    },1000);
   };
 
   const startRest = (duration, onComplete, isSetRest = false) => {
@@ -123,7 +136,7 @@ export default function HipExerciseApp() {
 
       setRemaining(prev => {
         const newVal = prev - 1;
-        if (newVal > 0 && newVal <= 2) speak(newVal.toString(), 0.9);
+        if (newVal > 0 && newVal <= 3) speak(newVal.toString(), 0.9);
         if (newVal <= 0) {
           clearInterval(timerRef.current);
           onComplete();
@@ -151,13 +164,21 @@ export default function HipExerciseApp() {
         startRest(REST_BETWEEN_SETS, () => {
           setCurrentSet(nextSet);
           setCurrentRep(0);
-            speak(`Starting ${exercises[nextSet].name}`, 0.9)
-  .then(() => new Promise(res => setTimeout(res, 6000))) // wait 300ms after speaking
+            if(exercises[nextSet].name != "Pillow knee press"){
+            speak(`Starting ${exercises[nextSet].name}`, 0.1)
+  .then(() => new Promise(res => setTimeout(res, 8000))) // wait 300ms after speaking
   .then(startRepCountdown);
+            }
+            else {
+            speak(`Starting ${exercises[nextSet].name} Please get ready you have 30 seconds`, 0.5)
+  .then(() => new Promise(res => setTimeout(res, 40000))) // wait 300ms after speaking
+  .then(startRepCountdown);
+            }
+
 
         }, true);
       } else {
-        speak("All exercises completed. Great job!", 0.9).then(() => {
+        speak("All exercises completed. Great job!", 0.6).then(() => {
           setIsRunning(false);
           setPhase(phases.IDLE);
           setCompleted(true);
