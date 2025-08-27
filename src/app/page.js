@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from "react";
 const TOTAL_SETS = 15;
 const REPS_PER_SET = 10;
 const REST_BETWEEN_SETS = 4; // seconds
-const REP_COUNTDOWN = 10; // seconds
+const REP_COUNTDOWN = 20; // seconds
 
 const exercises = [
   { name: "Warm up", image: "/exercise1.jpg", restBetweenReps: 1 },
