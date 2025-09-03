@@ -3,13 +3,13 @@
 import React, { useState, useEffect, useRef } from "react";
 
 const TOTAL_SETS = 15;
-const REPS_PER_SET = 10;
+const REPS_PER_SET = 12;
 const REST_BETWEEN_SETS = 4; // seconds
-var REP_COUNTDOWN = 21; // seconds
+var REP_COUNTDOWN = 24; // seconds
 
 const exercises = [
   { name: "Warm up", image: "/exercise1.jpg", restBetweenReps: 0 },
-  { name: "Left Khutta uchalne", image: "/exercise2.jpg", restBetweenReps: 10 },
+  { name: "Left Khutta uchalne", image: "/exercise2.jpg", restBetweenReps: 4},
   { name: "Right khutta uchalne", image: "/exercise0.jpg", restBetweenReps: 11 },
   { name: "Duetai khutta uchalne", image: "/exercise4.jpg", restBetweenReps: 10 },
   { name: "Left Khutta tanne", image: "/exercise3.jpg", restBetweenReps: 10 },
@@ -103,7 +103,7 @@ export default function HipExerciseApp() {
         const newVal = prev - 1;
             
             if(newVal > 0 && (exercises[currentSetRef.current].name == "Warm up" || exercises[currentSetRef.current].name == "End" || exercises[currentSetRef.current].name == "Right khutta bend up and down")){
-          if(newVal % 3 === 0 || newVal === REP_COUNTDOWN - 1){
+          if(newVal % 2 === 0 || newVal === REP_COUNTDOWN - 1){
           const intervalPassed = Math.floor(REP_COUNTDOWN - newVal)/3;
                 if (intervalPassed % 2=== 0 || newVal === REP_COUNTDOWN - 1) {
   speak("mathitira", 0.1).then(() => new Promise(res => setTimeout(res, 3000))) // wait 300ms after speaking
